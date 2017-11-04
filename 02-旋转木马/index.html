@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>轮播图旋转木马效果</title>
+	<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+
+	<style type="text/css">
+		*{margin: 0;padding: 0}
+		li{list-style: none;}
+		.slider{position: relative; margin:80px auto 0; max-width: 1140px; }
+		.slider .pic{position: relative; height: 300px;}
+		.slider .pic .item{position: absolute; top: 50%;  transform: translate(-50%,-50%);  width: 50%;  }
+		.slider .pic .item.item_1{z-index: 1;left: 20%; width: 30%;}
+		.slider .pic .item.item_2{z-index: 2;left: 35%; width: 40%;}
+		.slider .pic .item.item_3{z-index: 3;left: 50%; }
+		.slider .pic .item.item_4{ z-index: 2;left: 65%; width: 40%;}
+		.slider .pic .item.item_5{ z-index: 1;left: 80%; width: 30%;}
+		.slider .pic .item img{width: 100%;}
+		.slider .control{position: absolute; z-index: 10; top: 50%; transform: translateY(-50%); cursor: pointer; }
+		.slider .toRight{right: 0;}
+	</style>
+</head>
+<body>
+	<div class="slider">
+		<ul class="pic">
+			<li class="item item_1"><img src="images/1.jpg"></li>
+			<li class="item item_2"><img src="images/2.jpg"></li>
+			<li class="item item_3"><img src="images/3.jpg"></li>
+			<li class="item item_4"><img src="images/4.jpg"></li>
+			<li class="item item_5"><img src="images/5.jpg"></li>
+		</ul>
+		<div class="control toLeft"><img src="images/arrow_left.png"></div>
+		<div class="control toRight"><img src="images/arrow_right.png"></div>
+	</div>
+	
+	<script type="text/javascript">
+		//淡入淡出轮播效果
+		;(function($, window, document,undefined) {
+			//定义Slider的构造函数
+			var Slider = function (ele, opt) {
+				// body...
+				this.$element = ele;
+				this.$pic = this.$element.find('.pic');
+				this.$picItem = this.$element.find('.item');
+				this.$toLeft = this.$element.find('.toLeft');
+				this.$toRight = this.$element.find('.toRight');
+			}
+
+			//定义图片的dom元素，位置、大小的json数组
+			picData = [],
+			iNum = 0,	//标记是否是第一张与最后一张之间的切换
+			//定义Slider的构造方法
+			Slider.prototype = {
+
+				changeArr:function (argument) {
+					// body...
+					this.arr.push(3);
+					return this.arr;
+				},
+				//初始化picData
+				initializePicData:function (argument) {
+					this.$picItem.each(function(index, el) {
+						var iNow = {
+							'dom':'',
+							'domData':{
+									'width':'',
+									'left':'',
+									'zIndex':''
+								}
+						}
+						iNow.dom = $(this);
+						iNow.domData.width = $(this).css('width');
+						iNow.domData.left = $(this).css('left');
+						iNow.domData.zIndex = $(this).css('z-index');
+						picData.push(iNow);
+					});
+					return picData;
+				},
+
+				//右移动
+				toRight:function (argument) {
+					// body...
+					
+					picData.forEach( function(item, index,arr) {
+						// statements
+						if (index == (4-iNum) ) {
+							item.dom.css('z-index', '-1');
+						}else {
+							item.dom.css('z-index', arr[(index+1)%5].domData.zIndex);
+						}
+					});
+					
+
+					picData.forEach(function(item , index , arr) {
+						
+						//if (index == iNum) {item.dom.css('z-index', arr[(index+1)%5].domData.zIndex);}
+						
+						item.dom.stop().animate({
+							left: arr[(index+1)%5].domData.left ,
+							width: arr[(index+1)%5].domData.width,
+							//zIndex: arr[(index+1)%5].domData.zIndex
+						}, 800,function (argument) {
+								arr[index].domData.width = $(this).css('width');
+								arr[index].domData.left = $(this).css('left');
+								/*
+								if (index == (iNum+4)%5 ) {
+									item.dom.css('z-index', '1');
+								}
+								*/
+								if (index == 4) {
+									arr[(4-iNum)].dom.css('z-index', '1');
+									iNum = (iNum+ 1)%5;
+									//console.log(iNum);
+									//arr[index].dom.css('z-index', '1');
+								}
+								arr[index].domData.zIndex = $(this).css('zIndex');
+								
+								
+								
+							})
+					});
+				},
+				//左移动
+				toLeft:function (argument) {
+					// body...
+					
+					picData.forEach( function(item, index,arr) {
+						// statements
+						if (index == ((5-iNum)%5) ) {
+							item.dom.css('z-index', '-1');
+						}else {
+							item.dom.css('z-index', arr[(index+4)%5].domData.zIndex);
+						}
+					});
+					
+
+					picData.forEach(function(item , index , arr) {
+						
+						//if (index == iNum) {item.dom.css('z-index', arr[(index+1)%5].domData.zIndex);}
+						
+						item.dom.stop().animate({
+							left: arr[(index+4)%5].domData.left ,
+							width: arr[(index+4)%5].domData.width,
+							//zIndex: arr[(index+1)%5].domData.zIndex
+						}, 800,function (argument) {
+								arr[index].domData.width = $(this).css('width');
+								arr[index].domData.left = $(this).css('left');
+								/*
+								if (index == (iNum+4)%5 ) {
+									item.dom.css('z-index', '1');
+								}
+								*/
+								
+								
+								if (index == 0) {
+
+									arr[(5-iNum)%5].dom.css('z-index', '1');
+									iNum = (iNum+ 4)%5;
+									//console.log(iNum);
+								}
+								arr[index].domData.zIndex = $(this).css('zIndex');
+								
+							})
+					});
+				},
+
+				
+			}
+   
+			$.fn.Sup_Slider = function(options) {
+			    //在这里面,this指的是用jQuery选中的元素
+			    var slider = new Slider(this,options);
+			    //固定pic高度，防止动画的时候坍塌
+			    //slider.$pic.height(slider.$pic.height());
+			    //获取初始数据
+			    slider.initializePicData();
+	
+			    slider.$toRight.click(function(event) {
+			   	/* Act on the event */
+
+			   		slider.toRight();
+			   		//iNum = (iNum+ 1)%5;
+
+			    });
+			    slider.$toLeft.click(function(event) {
+			   	/* Act on the event */
+
+			   		slider.toLeft();
+			   		//iNum = (iNum+ 1)%5;
+
+			   });
+				
+			}
+
+		})(jQuery, window, document);
+
+		//插件调用
+		$('.slider').Sup_Slider({
+			
+		});
+
+	</script>
+</body>
+</html>
